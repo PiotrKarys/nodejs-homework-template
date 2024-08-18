@@ -1,6 +1,9 @@
 const express = require("express");
 const router = express.Router();
-
+const {
+  contactSchema,
+  updateContactSchema,
+} = require("../../models/validationSchemas");
 const {
   listContacts,
   getContactById,
@@ -32,13 +35,12 @@ router.get("/:contactId", async (req, res, next) => {
 
 router.post("/", async (req, res, next) => {
   try {
-    const { name, email, phone } = req.body;
-    if (!name || !email || !phone) {
-      return res
-        .status(400)
-        .json({ message: "missing required name, email, or phone field" });
+    const { error, value } = contactSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
     }
-    const newContact = await addContact(req.body);
+
+    const newContact = await addContact(value);
     res.status(201).json(newContact);
   } catch (error) {
     next(error);
@@ -59,11 +61,12 @@ router.delete("/:contactId", async (req, res, next) => {
 
 router.put("/:contactId", async (req, res, next) => {
   try {
-    const { name, email, phone } = req.body;
-    if (!name && !email && !phone) {
-      return res.status(400).json({ message: "missing fields" });
+    const { error, value } = updateContactSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
     }
-    const updatedContact = await updateContact(req.params.contactId, req.body);
+
+    const updatedContact = await updateContact(req.params.contactId, value);
     if (!updatedContact) {
       return res.status(404).json({ message: "Not found" });
     }
