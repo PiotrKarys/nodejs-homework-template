@@ -12,29 +12,45 @@ const {
   updateContact,
 } = require("../../models/contacts");
 
-router.get("/", async (_req, res, next) => {
+router.get("/", async (_req, res) => {
   try {
     const contacts = await listContacts();
-    res.status(200).json({ status: "success", data: contacts });
+    res.status(200).json({
+      status: "success",
+      message: "Contacts successfully retrieved",
+      data: contacts,
+    });
   } catch (error) {
-    next(error);
+    res.status(500).json({
+      status: "error",
+      message: "Internal Server Error: Could not retrieve contacts",
+    });
   }
 });
 
-router.get("/:contactId", async (req, res, next) => {
+router.get("/:contactId", async (req, res) => {
   const { contactId } = req.params;
   try {
     const contact = await getContactById(contactId);
     if (!contact) {
-      return res.status(404).json({ status: "error", message: "Not found" });
+      return res
+        .status(404)
+        .json({ status: "error", message: "Contact not found" });
     }
-    res.status(200).json({ status: "success", data: contact });
+    res.status(200).json({
+      status: "success",
+      message: "Exact contact successfully retrieved",
+      data: contact,
+    });
   } catch (error) {
-    next(error);
+    res.status(500).json({
+      status: "error",
+      message: "Internal Server Error: Could not retrieve exact contact",
+    });
   }
 });
 
-router.post("/", async (req, res, next) => {
+router.post("/", async (req, res) => {
   try {
     const { error, value } = contactSchema.validate(req.body);
     if (error) {
@@ -44,26 +60,40 @@ router.post("/", async (req, res, next) => {
     }
 
     const newContact = await addContact(value);
-    res.status(201).json({ status: "success", data: newContact });
+    res.status(201).json({
+      status: "success",
+      message: "Contact successfully added",
+      data: newContact,
+    });
   } catch (error) {
-    next(error);
+    res.status(500).json({
+      status: "error",
+      message: "Internal server error! Cannot add contact :(",
+    });
   }
 });
 
-router.delete("/:contactId", async (req, res, next) => {
+router.delete("/:contactId", async (req, res) => {
   const { contactId } = req.params;
   try {
     const removedContact = await removeContact(contactId);
     if (!removedContact) {
-      return res.status(404).json({ status: "error", message: "Not found" });
+      return res
+        .status(404)
+        .json({ status: "error", message: "Contact not found" });
     }
-    res.status(200).json({ status: "success", message: "Contact deleted" });
+    res
+      .status(200)
+      .json({ status: "success", message: "Contact successfully deleted" });
   } catch (error) {
-    next(error);
+    res.status(500).json({
+      status: "error",
+      message: "Internal server error! Cannot delete contact :(",
+    });
   }
 });
 
-router.put("/:contactId", async (req, res, next) => {
+router.put("/:contactId", async (req, res) => {
   const { contactId } = req.params;
   try {
     const { error, value } = updateContactSchema.validate(req.body);
@@ -75,15 +105,24 @@ router.put("/:contactId", async (req, res, next) => {
 
     const updatedContact = await updateContact(contactId, value);
     if (!updatedContact) {
-      return res.status(404).json({ status: "error", message: "Not found" });
+      return res
+        .status(404)
+        .json({ status: "error", message: "Contact Not found" });
     }
-    res.status(200).json({ status: "success", data: updatedContact });
+    res.status(200).json({
+      status: "success",
+      message: "Contact successfully updated",
+      data: updatedContact,
+    });
   } catch (error) {
-    next(error);
+    res.status(500).json({
+      status: "error",
+      message: "Internal server error! cannot update contact :(",
+    });
   }
 });
 
-router.patch("/:contactId/favorite", async (req, res, next) => {
+router.patch("/:contactId/favorite", async (req, res) => {
   const { contactId } = req.params;
   const { favorite } = req.body;
 
@@ -94,11 +133,20 @@ router.patch("/:contactId/favorite", async (req, res, next) => {
   try {
     const updatedContact = await updateStatusContact(contactId, { favorite });
     if (!updatedContact) {
-      return res.status(404).json({ status: "error", message: "Not found" });
+      return res
+        .status(404)
+        .json({ status: "error", message: "Contact not found" });
     }
-    res.status(200).json({ status: "success", data: updatedContact });
+    res.status(200).json({
+      status: "success",
+      message: "Contact is now your favourite!",
+      data: updatedContact,
+    });
   } catch (error) {
-    next(error);
+    res.status(500).json({
+      status: "error",
+      message: "Internal server error! It's not your favourite!",
+    });
   }
 });
 

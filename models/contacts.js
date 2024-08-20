@@ -1,4 +1,3 @@
-const mongoose = require("mongoose");
 const Contact = require("./contactModel");
 
 const listContacts = async () => {
