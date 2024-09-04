@@ -1,4 +1,12 @@
 const Joi = require("joi");
+const mongoose = require("mongoose");
+
+const idSchema = Joi.string().custom((value, helpers) => {
+  if (!mongoose.Types.ObjectId.isValid(value)) {
+    return helpers.message("Invalid ID format");
+  }
+  return value;
+});
 
 const contactSchema = Joi.object({
   name: Joi.string().min(1).max(100).required(),
@@ -19,4 +27,5 @@ const updateContactSchema = Joi.object({
 module.exports = {
   contactSchema,
   updateContactSchema,
+  idSchema,
 };

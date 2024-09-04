@@ -1,59 +1,24 @@
-const fs = require("fs/promises");
-const path = require("path");
-
-const contactsPath = path.join(__dirname, "contacts.json");
+const Contact = require("./contactModel");
 
 const listContacts = async () => {
-  const data = await fs.readFile(contactsPath, "utf-8");
-  return JSON.parse(data);
+  return Contact.find({});
 };
 
 const getContactById = async contactId => {
-  const contacts = await listContacts();
-  const contact = contacts.find(contact => contact.id === contactId);
-
-  if (!contact) {
-    console.log(`Contact with ID ${contactId} not found.`);
-  }
-
-  return contact || null;
+  return Contact.findById(contactId);
 };
 
 const removeContact = async contactId => {
-  const contacts = await listContacts();
-  const index = contacts.findIndex(contact => contact.id === contactId);
-
-  if (index === -1) {
-    console.log(`Contact with ID ${contactId} not found.`);
-    return null;
-  }
-
-  const [removedContact] = contacts.splice(index, 1);
-  await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
-  return removedContact;
+  return Contact.findByIdAndDelete(contactId);
 };
 
 const addContact = async body => {
-  const { nanoid } = await import("nanoid");
-  const contacts = await listContacts();
-  const newContact = { id: nanoid(), ...body };
-  contacts.push(newContact);
-  await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
-  return newContact;
+  const newContact = new Contact(body);
+  return newContact.save();
 };
 
-const updateContact = async (contactId, body) => {
-  const contacts = await listContacts();
-  const index = contacts.findIndex(contact => contact.id === contactId);
-
-  if (index === -1) {
-    console.log(`Contact with ID ${contactId} not found.`);
-    return null;
-  }
-
-  contacts[index] = { ...contacts[index], ...body };
-  await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
-  return contacts[index];
+const updateContact = async (contactId, updateData) => {
+  return Contact.findByIdAndUpdate(contactId, updateData, { new: true });
 };
 
 module.exports = {
