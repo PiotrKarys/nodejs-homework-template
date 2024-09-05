@@ -24,8 +24,21 @@ const updateContactSchema = Joi.object({
     .optional(),
 }).or("name", "email", "phone");
 
+const userSchema = Joi.object({
+  email: Joi.string().email().required(),
+  password: Joi.string().min(6).required(),
+});
+
+const subscriptionSchema = Joi.string().valid("starter", "pro", "business");
+
+const updateSubscriptionSchema = Joi.object({
+  subscription: subscriptionSchema.required(),
+});
+
 module.exports = {
+  idSchema,
   contactSchema,
   updateContactSchema,
-  idSchema,
+  userSchema,
+  updateSubscriptionSchema,
 };
