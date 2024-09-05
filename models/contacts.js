@@ -7,9 +7,6 @@ const listContacts = async (userId, { page = 1, limit = 10, favorite }) => {
   if (favorite !== undefined) {
     query.favorite = favorite === "true";
   }
-  console.log("Query:", query);
-  console.log("Skip:", skip);
-  console.log("Limit:", limit);
 
   const contacts = await Contact.find(query).skip(skip).limit(limit).exec();
   const total = await Contact.countDocuments(query);

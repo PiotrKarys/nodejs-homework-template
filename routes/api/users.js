@@ -28,7 +28,6 @@ router.post("/signup", async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    console.log("Hashed Password:", hashedPassword);
 
     const newUser = new User({
       email,
@@ -52,7 +51,6 @@ router.post("/login", async (req, res) => {
   try {
     const { error, value } = userSchema.validate(req.body);
     if (error) {
-      console.log(`Validation error: ${error.details[0].message}`);
       return res.status(400).json({
         status: "error",
         message: `Validation error: ${error.details[0].message}`,
@@ -60,10 +58,8 @@ router.post("/login", async (req, res) => {
     }
 
     const { email, password } = value;
-    console.log(`Trying to find user with email: ${email}`);
     const user = await User.findOne({ email });
     if (!user) {
-      console.log(`User not found: ${email}`);
       return res.status(401).json({
         status: "error",
         message: "Email or password is wrong",
@@ -71,9 +67,6 @@ router.post("/login", async (req, res) => {
     }
 
     const isMatch = bcrypt.compare(password, user.password);
-    console.log(`Password to check: ${password}`);
-    console.log(`Stored hashed password: ${user.password}`);
-    console.log(`Password match result: ${isMatch}`);
     if (!isMatch) {
       return res.status(401).json({
         status: "error",
@@ -85,7 +78,6 @@ router.post("/login", async (req, res) => {
     user.token = token;
     await user.save();
 
-    console.log(`Login successful for user: ${email}`);
     res.status(200).json({
       token,
       user: {
