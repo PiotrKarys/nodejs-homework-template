@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../../models/userModel");
 const { userSchema } = require("../../models/validationSchemas");
 const authMiddleware = require("../../middleware/authMiddleware");
+const gravatar = require("gravatar");
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -29,15 +30,22 @@ router.post("/signup", async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    const avatarURL = gravatar.url(email, { s: "250", r: "pg", d: "mm" }, true);
+
     const newUser = new User({
       email,
       password: hashedPassword,
+      avatarURL,
     });
     await newUser.save();
 
     res.status(201).json({
       status: "success",
-      user: { email: newUser.email, subscription: newUser.subscription },
+      user: {
+        email: newUser.email,
+        subscription: newUser.subscription,
+        avatarURL: newUser.avatarURL,
+      },
     });
   } catch (error) {
     res.status(500).json({
