@@ -23,7 +23,21 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage });
+const fileFilter = (req, file, cb) => {
+  const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
+  if (!allowedTypes.includes(file.mimetype)) {
+    return cb(null, false);
+  }
+  cb(null, true);
+};
+const limits = {
+  fileSize: 2 * 1024 * 1024,
+};
+const upload = multer({
+  storage,
+  fileFilter,
+  limits,
+});
 
 router.post("/signup", async (req, res) => {
   try {
