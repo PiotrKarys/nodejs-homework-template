@@ -139,6 +139,7 @@ router.post("/login", async (req, res) => {
 
     const { email, password } = value;
     const user = await User.findOne({ email });
+
     if (!user) {
       return res.status(401).json({
         status: "error",
@@ -154,7 +155,7 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    const isMatch = bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({
         status: "error",
