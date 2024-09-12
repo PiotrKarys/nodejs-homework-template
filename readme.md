@@ -75,13 +75,6 @@ npm start
 
    docker run -p 3000:3000 --env-file .env nodejs-api
 
-## Struktura projektu
-
-project-root/ ├── app.js ├── routes/ │ └── api/ │ └── users.js │ └── contacts.js
-├── models/ │ └── userModel.js │ └── contactModel.js │ └── validationSchemas.js
-├── middleware/ │ └── authMiddleware.js ├── public/ │ └── avatars/ ├── tests/ │
-└── users.test.js ├── package.json ├── .env └── README.md
-
 ## Endpointy
 
 ### Użytkownicy
