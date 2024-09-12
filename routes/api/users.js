@@ -273,5 +273,49 @@ router.patch("/subscription", authMiddleware, async (req, res) => {
     });
   }
 });
+router.patch(
+  "/avatars",
+  authMiddleware,
+  upload.single("avatar"),
+  async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({
+          status: "error",
+          message: "No file uploaded",
+        });
+      }
+      const tmpPath = req.file.path;
+      const userFileName = `${req.user._id}${path.extname(
+        req.file.originalname
+      )}`;
+      const avatarPath = path.join("public", "avatars", userFileName);
+
+      const image = await Jimp.read(tmpPath);
+      await image.resize(250, 250).writeAsync(avatarPath);
+
+      fs.unlinkSync(tmpPath);
+
+      const avatarURL = `/avatars/${userFileName}`;
+      const updatedUser = await User.findByIdAndUpdate(
+        req.user._id,
+        { avatarURL },
+        { new: true }
+      );
+
+      res.status(200).json({
+        status: "success",
+        message: "Avatar updated successfully",
+        data: { avatarURL: updatedUser.avatarURL },
+      });
+    } catch (error) {
+      console.error(`Error during avatar update: ${error.message}`);
+      res.status(500).json({
+        status: "error",
+        message: `Internal Server Error: ${error.message}`,
+      });
+    }
+  }
+);
 
 module.exports = router;
