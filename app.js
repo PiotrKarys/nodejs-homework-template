@@ -22,7 +22,7 @@ app.use((req, res) => {
   res.status(404).json({ message: "Not found" });
 });
 
-app.use((err, res) => {
+app.use((err, req, res, next) => {
   if (err.isJoi) {
     return res.status(400).json({
       status: "error",
